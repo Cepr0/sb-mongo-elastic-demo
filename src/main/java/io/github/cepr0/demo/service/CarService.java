@@ -6,7 +6,7 @@ import io.github.cepr0.demo.dto.CarRequest;
 import io.github.cepr0.demo.dto.CarResponse;
 import io.github.cepr0.demo.mapper.CarMapper;
 import io.github.cepr0.demo.model.Car;
-import io.github.cepr0.demo.model.ElasticCar;
+import io.github.cepr0.demo.model.elastic.ElasticCar;
 import io.github.cepr0.demo.repo.elastic.CarElasticRepo;
 import io.github.cepr0.demo.repo.mongo.CarRepo;
 import io.github.cepr0.demo.service.event.CarCreateEvent;
@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -60,7 +59,6 @@ public class CarService extends AbstractCrudService<Car, String, CarRequest, Car
 		log.debug("[d] Put new car to elastic: {}", elasticCar);
 	}
 
-	@Transactional
 	@Async
 	@EventListener
 	public void changeInElasticOnUpdate(CarUpdateEvent event) {
@@ -81,7 +79,6 @@ public class CarService extends AbstractCrudService<Car, String, CarRequest, Car
 		}
 	}
 
-	@Transactional
 	@Async
 	@EventListener
 	public void removeInElasticOnDelete(CarDeleteEvent event) {

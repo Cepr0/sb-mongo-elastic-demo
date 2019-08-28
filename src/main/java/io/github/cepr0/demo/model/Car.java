@@ -4,8 +4,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.TypeAlias;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -15,14 +13,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "cars")
 @TypeAlias("car")
 public class Car extends BaseDoc {
-
 	private String brand;
-
 	private String model;
-
 	private Integer year;
-
-	@DBRef(lazy = true)
-	@Field(type = FieldType.Nested)
-	private Person person;
+	@DBRef(lazy = true) private Person person;
 }

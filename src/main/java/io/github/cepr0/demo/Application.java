@@ -1,9 +1,9 @@
 package io.github.cepr0.demo;
 
 import io.github.cepr0.demo.model.Car;
-import io.github.cepr0.demo.model.ElasticCar;
-import io.github.cepr0.demo.model.ElasticPerson;
 import io.github.cepr0.demo.model.Person;
+import io.github.cepr0.demo.model.elastic.ElasticCar;
+import io.github.cepr0.demo.model.elastic.ElasticPerson;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -15,7 +15,6 @@ import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @EnableAsync
@@ -41,7 +40,6 @@ public class Application {
 		return new MongoTransactionManager(dbFactory);
 	}
 
-	@Async
 	@EventListener(ApplicationReadyEvent.class)
 	public void onReady() {
 
@@ -58,9 +56,11 @@ public class Application {
 		if (elasticsearchTemplate.indexExists(ElasticPerson.class)) {
 			elasticsearchTemplate.deleteIndex(ElasticPerson.class);
 		}
+		elasticsearchTemplate.createIndex(ElasticPerson.class);
 
 		if (elasticsearchTemplate.indexExists(ElasticCar.class)) {
 			elasticsearchTemplate.deleteIndex(ElasticCar.class);
 		}
+		elasticsearchTemplate.createIndex(ElasticCar.class);
 	}
 }
