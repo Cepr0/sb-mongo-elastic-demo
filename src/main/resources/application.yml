@@ -4,6 +4,7 @@ logging:
       springframework:
         data: debug
         web: debug
+    io.github.cepr0: debug
 
 spring:
   elasticsearch:
