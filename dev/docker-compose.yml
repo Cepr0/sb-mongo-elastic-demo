@@ -42,14 +42,17 @@ services:
       - mongo1
       - mongo2
     volumes:
-      - .:/scripts
+      - ..:/scripts
     entrypoint: [ "bash", "/scripts/mongo-setup.sh" ]
 
   elasticsearch:
     hostname: elasticsearch
     container_name: elasticsearch
+#    image: docker.elastic.co/elasticsearch/elasticsearch:7.3.1
     image: docker.elastic.co/elasticsearch/elasticsearch:6.5.1
     environment:
+#      - xpack.security.enabled=false
+#      - ES_JAVA_OPTS=-Xms512m -Xmx512m
       - discovery.type=single-node
     ports:
       - 9200:9200
@@ -60,9 +63,20 @@ services:
       timeout: 5s
       retries: 10
 
+#  elastichq:
+#    hostname: elastichq
+#    container_name: elastichq
+#    image: elastichq/elasticsearch-hq
+#    ports:
+#      - 5000:5000
+#    depends_on:
+#      elasticsearch:
+#        condition: service_healthy
+
   kibana:
     hostname: kibana
     container_name: kibana
+#    image: docker.elastic.co/kibana/kibana:7.3.1
     image: docker.elastic.co/kibana/kibana:6.5.1
     ports:
       - 5601:5601
@@ -90,21 +104,11 @@ services:
       kibana:
         condition: service_healthy
 
-  demo-service:
-    build: .
-    restart: on-failure
-    ports:
-      - 8080:8080
-    environment:
-      - SPRING_ELASTICSEARCH_REST_URIS=http://elasticsearch:9200
-      - SPRING_DATA_ELASTICSEARCH_CLUSTER_NAME=docker-cluster
-      - SPRING_DATA_ELASTICSEARCH_CLUSTER_NODES=elasticsearch:9300
-      - SPRING_DATA_MONGODB_DATABASE=demo
-      - SPRING_DATA_MONGODB_URI=mongodb://mongo0:27017,mongo1:27017,mongo2:27017/?replicaSet=rs0
-      - ELASTIC_APM_SERVICE_NAME=demo-service
-      - ELASTIC_APM_APPLICATION_PACKAGES=io.github.cepr0.demo
-      - ELASTIC_APM_SERVER_URL=http://localhost:8200
-      - ELASTIC_APM_SECRET_TOKEN=xxVpmQB2HMzCL9PgBHVrnxjNXXw5J7bd79DFm6sjBJR5HPXDhcF8MSb3vv4bpg44
+  environment-is-ready:
+    hostname: environment-is-ready
+    container_name: environment-is-ready
+    image: alpine
+    restart: "no"
     depends_on:
       mongo0:
         condition: service_healthy
