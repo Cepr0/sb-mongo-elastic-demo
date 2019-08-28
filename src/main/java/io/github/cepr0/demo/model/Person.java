@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.TypeAlias;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -17,5 +19,8 @@ import java.util.Set;
 @TypeAlias("person")
 public class Person extends BaseDoc {
 	private String name;
-	@DBRef(lazy = true) private Set<Car> cars = new HashSet<>();
+
+	@DBRef(lazy = true)
+	@Field(type = FieldType.Nested, includeInParent = true)
+	private Set<Car> cars = new HashSet<>();
 }

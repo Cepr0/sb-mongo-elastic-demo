@@ -6,7 +6,16 @@ logging:
         web: debug
 
 spring:
+  elasticsearch:
+    rest:
+      uris: http://localhost:9200
+
   data:
+    elasticsearch:
+      cluster-name: docker-cluster
+      cluster-nodes: localhost:9300
+
     mongodb:
       database: demo
 #      uri: mongodb://localhost:27017,localhost:27018,localhost:27019/?replicaSet=rs0
+

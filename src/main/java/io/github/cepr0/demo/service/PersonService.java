@@ -1,12 +1,12 @@
 package io.github.cepr0.demo.service;
 
 import io.github.cepr0.crud.service.AbstractCrudService;
-import io.github.cepr0.demo.model.Car;
-import io.github.cepr0.demo.model.Person;
 import io.github.cepr0.demo.dto.PersonRequest;
 import io.github.cepr0.demo.dto.PersonResponse;
 import io.github.cepr0.demo.mapper.PersonMapper;
-import io.github.cepr0.demo.repo.PersonRepo;
+import io.github.cepr0.demo.model.Car;
+import io.github.cepr0.demo.model.Person;
+import io.github.cepr0.demo.repo.mongo.PersonRepo;
 import io.github.cepr0.demo.service.event.CarCreateEvent;
 import io.github.cepr0.demo.service.event.CarDeleteEvent;
 import org.springframework.context.event.EventListener;

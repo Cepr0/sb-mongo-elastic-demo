@@ -51,16 +51,27 @@ services:
 #    image: docker.elastic.co/elasticsearch/elasticsearch:7.3.1
     image: docker.elastic.co/elasticsearch/elasticsearch:6.5.1
     environment:
-      - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
-#      - discovery.type=single-node
+#      - xpack.security.enabled=false
+#      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - discovery.type=single-node
     ports:
       - 9200:9200
+      - 9300:9300
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:9200']
       interval: 20s
       timeout: 5s
       retries: 10
+
+  elastichq:
+    hostname: elastichq
+    container_name: elastichq
+    image: elastichq/elasticsearch-hq
+    ports:
+      - 5000:5000
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
 
   kibana:
     hostname: kibana
