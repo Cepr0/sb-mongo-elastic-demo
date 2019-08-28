@@ -1,0 +1,105 @@
+version: '2.4'
+services:
+  mongo0:
+    hostname: mongo0
+    container_name: mongo0
+    image: mongo
+    ports:
+      - 27017:27017
+    restart: on-failure
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+    healthcheck:
+      test: mongo --eval "printjson(rs.isMaster())" | grep ismaster | grep true
+      interval: 20s
+      timeout: 5s
+      retries: 10
+
+  mongo1:
+    hostname: mongo1
+    container_name: mongo1
+    image: mongo
+    ports:
+      - 27018:27017
+    restart: on-failure
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+
+  mongo2:
+    hostname: mongo2
+    container_name: mongo2
+    image: mongo
+    ports:
+      - 27019:27017
+    restart: on-failure
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+
+  cluster-setup:
+    hostname: cluster-setup
+    container_name: cluster-setup
+    image: mongo
+    restart: "no"
+    depends_on:
+      - mongo0
+      - mongo1
+      - mongo2
+    volumes:
+      - .:/scripts
+    entrypoint: [ "bash", "/scripts/mongo-setup.sh" ]
+
+  elasticsearch:
+    hostname: elasticsearch
+    container_name: elasticsearch
+#    image: docker.elastic.co/elasticsearch/elasticsearch:7.3.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.5.1
+    environment:
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+#      - discovery.type=single-node
+    ports:
+      - 9200:9200
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9200']
+      interval: 20s
+      timeout: 5s
+      retries: 10
+
+  kibana:
+    hostname: kibana
+    container_name: kibana
+#    image: docker.elastic.co/kibana/kibana:7.3.1
+    image: docker.elastic.co/kibana/kibana:6.5.1
+    ports:
+      - 5601:5601
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:5601']
+      interval: 20s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+  apm-server:
+    hostname: apm-server
+    container_name: apm-server
+    image: playdingnow/elastic-apm-server:1.6.0
+    ports:
+      - 8200:8200
+    healthcheck:
+      test: printf "GET / HTTP/1.1\n\n" > /dev/tcp/127.0.0.1/8200
+      interval: 20s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      kibana:
+        condition: service_healthy
+
+  environment-is-ready:
+    hostname: environment-is-ready
+    container_name: environment-is-ready
+    image: alpine
+    restart: "no"
+    depends_on:
+      mongo0:
+        condition: service_healthy
+      apm-server:
+        condition: service_healthy
