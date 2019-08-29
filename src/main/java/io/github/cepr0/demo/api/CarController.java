@@ -23,35 +23,30 @@ public class CarController extends AbstractCrudController<Car, String, CarReques
 
 	@PostMapping
 	@Override
-
 	public ResponseEntity<CarResponse> create(@Validated(OnCreate.class) @RequestBody final CarRequest request) {
 		return super.create(request);
 	}
 
 	@PatchMapping("/{id}")
 	@Override
-
 	public ResponseEntity<CarResponse> update(@PathVariable("id") final String id, @Validated(OnUpdate.class) @RequestBody final CarRequest request) {
 		return super.update(id, request);
 	}
 
 	@DeleteMapping("/{id}")
 	@Override
-
 	public ResponseEntity<?> delete(@PathVariable("id") final String id) {
 		return super.delete(id);
 	}
 
 	@GetMapping("/{id}")
 	@Override
-
 	public ResponseEntity<CarResponse> getOne(@PathVariable("id") final String id) {
 		return super.getOne(id);
 	}
 
 	@GetMapping
 	@Override
-
 	public ResponseEntity<List<CarResponse>> getAll() {
 		return super.getAll();
 	}
