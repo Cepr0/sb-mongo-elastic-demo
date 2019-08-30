@@ -2,18 +2,14 @@ package io.github.cepr0.demo.model.elastic;
 
 import io.github.cepr0.crud.model.ContentAlias;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Version;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.elasticsearch.annotations.Document;
-
-import java.io.Serializable;
 
 @ContentAlias("cars")
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Document(indexName = "car")
-public class ElasticCar implements Serializable {
-	@Id private String id;
-	@Version private Long version;
+public class ElasticCar extends BaseElasticEntity {
 	private String brand;
 	private String model;
 	private Integer year;

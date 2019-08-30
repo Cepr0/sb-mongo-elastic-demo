@@ -1,4 +1,4 @@
-package io.github.cepr0.demo.model;
+package io.github.cepr0.demo.model.base;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

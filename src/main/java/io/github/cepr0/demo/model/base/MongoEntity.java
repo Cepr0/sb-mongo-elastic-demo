@@ -1,4 +1,4 @@
-package io.github.cepr0.demo.model;
+package io.github.cepr0.demo.model.base;
 
 import io.github.cepr0.crud.model.IdentifiableEntity;
 

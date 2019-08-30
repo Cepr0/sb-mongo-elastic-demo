@@ -6,21 +6,16 @@ import io.github.cepr0.demo.dto.CarRequest;
 import io.github.cepr0.demo.dto.CarResponse;
 import io.github.cepr0.demo.mapper.CarMapper;
 import io.github.cepr0.demo.model.Car;
-import io.github.cepr0.demo.model.elastic.ElasticCar;
 import io.github.cepr0.demo.repo.elastic.CarElasticRepo;
 import io.github.cepr0.demo.repo.mongo.CarRepo;
 import io.github.cepr0.demo.service.event.CarCreateEvent;
 import io.github.cepr0.demo.service.event.CarDeleteEvent;
 import io.github.cepr0.demo.service.event.CarUpdateEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.index.engine.VersionConflictEngineException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.event.TransactionalEventListener;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.Optional;
 
@@ -60,54 +55,5 @@ public class CarService extends AbstractCrudService<Car, String, CarRequest, Car
 	public Optional<CarResponse> recoverUpdate(Exception e, String id, CarRequest source) {
 		log.error("[!] Updating the car #'{}' with {} is failed due to {}", id, source, e.toString());
 		return Optional.empty();
-	}
-
-	@Async
-	@TransactionalEventListener
-	public void putToElasticOnCreate(CarCreateEvent event) {
-		Car car = event.getEntity();
-		ElasticCar elasticCar = new ElasticCar()
-				.setId(car.getId())
-				.setVersion(car.getVersion())
-				.setBrand(car.getBrand())
-				.setModel(car.getModel())
-				.setYear(car.getYear());
-
-		carElasticRepo.save(elasticCar);
-		log.debug("[d] Put new car to elastic: {}", elasticCar);
-	}
-
-	@Async
-	@TransactionalEventListener
-	public void changeInElasticOnUpdate(CarUpdateEvent event) {
-		Car car = event.getEntity();
-		String carId = car.getId();
-		try {
-			Optional<ElasticCar> result = carElasticRepo.findById(carId)
-					.map(elasticCar -> {
-						elasticCar.setVersion(car.getVersion());
-						elasticCar.setBrand(car.getBrand());
-						elasticCar.setModel(car.getModel());
-						elasticCar.setYear(car.getYear());
-						carElasticRepo.save(elasticCar);
-						log.debug("[d] Car changed in elastic: {}", elasticCar);
-						return elasticCar;
-					});
-			if (!result.isPresent()) {
-				log.warn("[w] Car not found in elastic: {}", car);
-			}
-		} catch (VersionConflictEngineException e) {
-			log.error("[!] Version conflict for: {}. Cause: {}", car, e.toString());
-			TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-		}
-	}
-
-	@Async
-	@TransactionalEventListener
-	public void removeInElasticOnDelete(CarDeleteEvent event) {
-		Car car = event.getEntity();
-		String carId = car.getId();
-		carElasticRepo.deleteById(carId);
-		log.debug("[d] Car removed from elastic: {}", car);
 	}
 }
