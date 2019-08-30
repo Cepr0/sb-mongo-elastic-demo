@@ -68,6 +68,7 @@ public class CarService extends AbstractCrudService<Car, String, CarRequest, Car
 		Car car = event.getEntity();
 		ElasticCar elasticCar = new ElasticCar()
 				.setId(car.getId())
+				.setVersion(car.getVersion())
 				.setBrand(car.getBrand())
 				.setModel(car.getModel())
 				.setYear(car.getYear());
@@ -84,7 +85,7 @@ public class CarService extends AbstractCrudService<Car, String, CarRequest, Car
 		try {
 			Optional<ElasticCar> result = carElasticRepo.findById(carId)
 					.map(elasticCar -> {
-						elasticCar.setVersion(car.getVersion() + 1L);
+						elasticCar.setVersion(car.getVersion());
 						elasticCar.setBrand(car.getBrand());
 						elasticCar.setModel(car.getModel());
 						elasticCar.setYear(car.getYear());

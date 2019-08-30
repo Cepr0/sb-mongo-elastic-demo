@@ -13,7 +13,7 @@ import org.springframework.data.domain.Persistable;
 public abstract class BaseDoc extends MongoEntity<String> implements Persistable<String> {
 
 	@Id private String id;
-	@Version private Integer version;
+	@Version private Long version;
 
 	@Override
 	public boolean isNew() {
